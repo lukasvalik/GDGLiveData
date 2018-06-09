@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">GDGLiveData</string>
+    <string name="reserve">Reserve %d</string>
+</resources>

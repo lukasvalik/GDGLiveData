@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <data>
+        <variable
+            name="vm"
+            type="com.lukasvalik.gdglivedata.ui.presentation.PresentationVM"/>
+    </data>
+
+    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/image"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:scaleType="fitXY"
+            app:layout_constraintHeight_percent="0.4"
+            app:layout_constraintTop_toTopOf="parent"
+            app:url="@{vm.hotel.url}"/>
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:padding="12dp"
+            android:textSize="22dp"
+            android:textColor="@color/white"
+            android:text="@{vm.hotel.name}"
+            app:layout_constraintTop_toBottomOf="@+id/image"
+            tools:text="Hilton" />
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/button"
+            android:layout_width="200dp"
+            android:layout_height="@dimen/button_size"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@{String.format(@string/reserve, vm.timer.seconds)}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/name"
+            tools:text="Reserve 10"/>
+
+    </android.support.constraint.ConstraintLayout>
+</layout>

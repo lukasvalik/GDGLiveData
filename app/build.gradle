@@ -1,0 +1,54 @@
+apply plugin: 'com.android.application'
+
+apply plugin: 'kotlin-android'
+
+apply plugin: 'kotlin-android-extensions'
+
+apply plugin: 'kotlin-kapt'
+
+android {
+    compileSdkVersion 27
+    defaultConfig {
+        applicationId "com.lukasvalik.gdglivedata"
+        minSdkVersion 16
+        targetSdkVersion 27
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    dataBinding {
+        enabled = true
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation"org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
+    //architecture components
+    implementation "android.arch.lifecycle:runtime:$arch_components_version"
+    implementation "android.arch.lifecycle:extensions:$arch_components_version"
+    kapt "android.arch.lifecycle:compiler:$arch_components_version"
+    implementation "android.arch.persistence.room:runtime:$arch_persistance_version"
+    kapt "android.arch.persistence.room:compiler:$arch_persistance_version"
+    implementation "android.arch.persistence.room:rxjava2:$arch_persistance_version"
+
+    //image
+    implementation "com.github.bumptech.glide:glide:$glide_version"
+    implementation "jp.wasabeef:glide-transformations:$glide_transformations_version"
+
+    //Navigation
+    implementation "android.arch.navigation:navigation-fragment:$nav_version" // use -ktx for Kotlin
+    implementation "android.arch.navigation:navigation-ui:$nav_version"
+}
