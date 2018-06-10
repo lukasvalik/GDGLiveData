@@ -2,11 +2,11 @@ package com.lukasvalik.gdglivedata.Repository
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
-import android.os.AsyncTask
+import com.lukasvalik.gdglivedata.AppExecutors
 import com.lukasvalik.gdglivedata.model.Hotel
 import com.lukasvalik.gdglivedata.model.HotelDao
 
-class HotelRepository(private val hotelDao: HotelDao) {
+class HotelRepository(private val hotelDao: HotelDao, private val appExecutors: AppExecutors) {
 
     private val hotels : LiveData<List<Hotel>> = hotelDao.loadHotels()
 
@@ -18,11 +18,11 @@ class HotelRepository(private val hotelDao: HotelDao) {
         return data
     }
 
-    fun updateHotel(hotel: Hotel) = AsyncTask.execute {hotelDao.insertHotel(hotel) }
+    fun updateHotel(hotel: Hotel) = appExecutors.diskIO().execute {hotelDao.insertHotel(hotel) }
 
-    fun resetSeenHotels() = AsyncTask.execute { hotelDao.resetSeenHotels() }
+    fun resetSeenHotels() = appExecutors.diskIO().execute { hotelDao.resetSeenHotels() }
 
-    fun setDefaultHotelList() = AsyncTask.execute{ hotelDao.insertHotelList(DEFAULT_HOTEL_LIST) }
+    fun setDefaultHotelList() = appExecutors.diskIO().execute { hotelDao.insertHotelList(DEFAULT_HOTEL_LIST) }
 
     companion object {
         val DEFAULT_HOTEL_LIST = arrayListOf(
