@@ -2,22 +2,13 @@ package com.lukasvalik.gdglivedata.Repository
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
+import android.os.AsyncTask
 import com.lukasvalik.gdglivedata.model.Hotel
+import com.lukasvalik.gdglivedata.model.HotelDao
 
-class HotelRepository {
+class HotelRepository(private val hotelDao: HotelDao) {
 
-    private val hotels = MutableLiveData<List<Hotel>>()
-
-    init {
-        val hotelList = arrayListOf(
-                Hotel("Hilton", "http://www3.hilton.com/resources/media/hi/WATHNHN/en_US/img/shared/full_page_image_gallery/main/HL_hotelexteriorview01_2_675x359_FitToBoxSmallDimension_Center.jpg", false),
-                Hotel("Tapolca Fogado", "https://edge.media.datahc.com/HI154550957.jpg", true),
-                Hotel("Sanja Vodice", "https://edge.media.datahc.com/HI500053572.jpg", true),
-                Hotel("Rixos Libertas", "https://edge.media.datahc.com/HI409050723.jpg", false),
-                Hotel("Lapad", "https://edge.media.datahc.com/HI401664845.jpg", false),
-                Hotel("Valamar Lacroma", "https://edge.media.datahc.com/HI380766419.jpg", false))
-        hotels.value = hotelList
-    }
+    private val hotels : LiveData<List<Hotel>> = hotelDao.loadHotels()
 
     fun getHotels() : LiveData<List<Hotel>> = hotels
 
@@ -27,23 +18,19 @@ class HotelRepository {
         return data
     }
 
-    fun markHotelAsSeen(hotelName: String?) {
-        hotels.value?.firstOrNull { it.name.equals(hotelName) }?.seen = true
-    }
+    fun updateHotel(hotel: Hotel) = AsyncTask.execute {hotelDao.insertHotel(hotel) }
 
-    fun getNextUnseenHotelName() : String {
-        val nextHotel = hotels.value?.firstOrNull { !it.seen }
-        return when (nextHotel) {
-            null -> {
-                resetHotels()
-                getNextUnseenHotelName()
-            }
-            else -> nextHotel.name
-        }
-    }
+    fun resetSeenHotels() = AsyncTask.execute { hotelDao.resetSeenHotels() }
 
-    fun resetHotels() {
-        //TODO make dao do it in one query ideally
-        hotels.value?.filter { it.seen }?.forEach({it.seen = false})
+    fun setDefaultHotelList() = AsyncTask.execute{ hotelDao.insertHotelList(DEFAULT_HOTEL_LIST) }
+
+    companion object {
+        val DEFAULT_HOTEL_LIST = arrayListOf(
+                Hotel("Hilton", "http://www3.hilton.com/resources/media/hi/WATHNHN/en_US/img/shared/full_page_image_gallery/main/HL_hotelexteriorview01_2_675x359_FitToBoxSmallDimension_Center.jpg", false),
+                Hotel("Tapolca Fogado", "https://edge.media.datahc.com/HI154550957.jpg", true),
+                Hotel("Sanja Vodice", "https://edge.media.datahc.com/HI500053572.jpg", true),
+                Hotel("Rixos Libertas", "https://edge.media.datahc.com/HI409050723.jpg", false),
+                Hotel("Lapad", "https://edge.media.datahc.com/HI401664845.jpg", false),
+                Hotel("Valamar Lacroma", "https://edge.media.datahc.com/HI380766419.jpg", false))
     }
 }
