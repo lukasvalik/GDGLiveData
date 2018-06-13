@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">GDGLiveData</string>
     <string name="reserve">Reserve %d</string>
+    <string name="chain_request_status">Request Chain status: %s</string>
+    <string name="session_status">Session status: %s</string>
+    <string name="checkbox_info">Loading in background (ObserveForever)</string>
 </resources>
