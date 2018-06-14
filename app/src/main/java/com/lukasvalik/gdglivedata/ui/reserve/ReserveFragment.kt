@@ -1,6 +1,5 @@
 package com.lukasvalik.gdglivedata.ui.reserve
 
-import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
@@ -29,9 +28,9 @@ class ReserveFragment : Fragment() {
         viewModel = ViewModelProviders.of(this).get(ReserveVM::class.java)
         binding.vm = viewModel
 
-        viewModel.activeSession().observe(this, Observer { Log.d("SESSION", if (it == false) "closed" else "active") } )
+        viewModel.isSessionActive().observe(this, Observer { Log.d("SESSION", if (it == false) "closed" else "active") } )
         viewModel.checkBoxChecked.observe(this, Observer { onCheckBoxClicked(it) } )
-        viewModel.request2.observe(this, requestObserver)
+        viewModel.getChainRequestResult().observe(this, requestObserver)
     }
 
     /**
@@ -39,11 +38,11 @@ class ReserveFragment : Fragment() {
      */
     private fun onCheckBoxClicked(checked: Boolean?) {
         if (checked != false) {
-            viewModel.request2.removeObserver(requestObserver)
-            viewModel.request2.observeInBackground(requestObserver)
+            viewModel.getChainRequestResult().removeObserver(requestObserver)
+            viewModel.getChainRequestResult().observeInBackground(requestObserver)
         } else {
             // we do not remove previous observer since we remove observerInBackground right after finishing task
-            viewModel.request2.observe(this, requestObserver)
+            viewModel.getChainRequestResult().observe(this, requestObserver)
         }
         viewModel.startLoading()
     }
