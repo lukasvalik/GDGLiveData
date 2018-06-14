@@ -3,8 +3,8 @@ package com.lukasvalik.gdglivedata
 import android.app.Application
 import android.arch.persistence.room.Room
 import com.lukasvalik.gdglivedata.Repository.HotelRepository
-import com.lukasvalik.gdglivedata.model.AppDatabase
-import com.lukasvalik.gdglivedata.model.HotelDao
+import com.lukasvalik.gdglivedata.db.AppDatabase
+import com.lukasvalik.gdglivedata.db.HotelDao
 
 class App : Application() {
 

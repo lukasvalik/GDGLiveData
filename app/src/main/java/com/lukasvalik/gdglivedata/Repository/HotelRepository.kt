@@ -3,8 +3,8 @@ package com.lukasvalik.gdglivedata.Repository
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.os.AsyncTask
-import com.lukasvalik.gdglivedata.model.Hotel
-import com.lukasvalik.gdglivedata.model.HotelDao
+import com.lukasvalik.gdglivedata.db.Hotel
+import com.lukasvalik.gdglivedata.db.HotelDao
 
 class HotelRepository(private val hotelDao: HotelDao) {
 
