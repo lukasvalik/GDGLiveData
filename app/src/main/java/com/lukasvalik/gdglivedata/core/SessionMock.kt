@@ -27,10 +27,6 @@ class SessionMock {
     })
 
     init {
-        reset()
-    }
-
-    fun reset() {
         sessionRefreshRunnable = Runnable {
             // you cannot refresh session which has been closed
             sessionRefreshed.value = active.value
@@ -39,5 +35,11 @@ class SessionMock {
             }
         }
         sessionHandler.post(sessionRefreshRunnable)
+    }
+
+    fun reset() {
+        timestamp = System.currentTimeMillis()
+        sessionRefreshed.value = true
+        sessionHandler.postDelayed(sessionRefreshRunnable, REFRESH_SESSION)
     }
 }
