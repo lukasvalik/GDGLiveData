@@ -14,13 +14,22 @@ fun <T> LiveData<T>.reObserve(owner: LifecycleOwner, observer: Observer<T>) {
 
 // observeForever and unsubscribe once result is emitted
 fun <T> LiveData<T>.observeInBackground(observer: Observer<T>) {
-    this.observeForever(UnRegisterObserver(this, observer))
+    val lastValueWillBeEmitted = this.value != null
+    this.observeForever(UnRegisterObserver(this, observer, lastValueWillBeEmitted))
 }
 
-class UnRegisterObserver<T>(private val liveData: LiveData<T>, private val observer: Observer<T>) : Observer<T> {
+class UnRegisterObserver<T>(private val liveData: LiveData<T>,
+                            private val observer: Observer<T>,
+                            lastValueWillBeEmitted: Boolean) : Observer<T> {
+    var lastValueHasBeenEmitted = !lastValueWillBeEmitted
+
     override fun onChanged(t: T?) {
         observer.onChanged(t)
-        liveData.removeObserver(this)
+        if (lastValueHasBeenEmitted) {
+            liveData.removeObserver(this)
+        } else {
+            lastValueHasBeenEmitted = true
+        }
     }
 }
 

@@ -2,8 +2,8 @@ package com.lukasvalik.gdglivedata.ui.presentation
 
 import android.arch.lifecycle.*
 import com.lukasvalik.gdglivedata.Repository.HotelRepository
-import com.lukasvalik.gdglivedata.component.OnScreenTimer
-import com.lukasvalik.gdglivedata.model.Hotel
+import com.lukasvalik.gdglivedata.core.OnScreenTimer
+import com.lukasvalik.gdglivedata.db.Hotel
 
 class PresentationVM(private val repository: HotelRepository) : ViewModel() {
 
@@ -11,7 +11,7 @@ class PresentationVM(private val repository: HotelRepository) : ViewModel() {
     private val hotelName = MediatorLiveData<String>()
 
     val hotel: LiveData<Hotel> = Transformations.switchMap(hotelName, { repository.getHotel(it) })
-    val timer = OnScreenTimer(5, {  markHotelAsSeen() })
+    val timer = OnScreenTimer(5, { markHotelAsSeen() })
 
     init {
         // Adding source without ever removing it is safe only in init method

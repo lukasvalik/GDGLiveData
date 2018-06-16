@@ -6,7 +6,9 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.Navigation
 import com.lukasvalik.gdglivedata.App
+import com.lukasvalik.gdglivedata.R
 import com.lukasvalik.gdglivedata.databinding.FragmentPresentationBinding
 import com.lukasvalik.gdglivedata.extensions.reObserve
 
@@ -19,6 +21,7 @@ class PresentationFragment : Fragment() {
         super.onCreateView(inflater, container, savedInstanceState)
         binding = FragmentPresentationBinding.inflate(inflater, container, false)
         binding.setLifecycleOwner(this)
+        binding.button.setOnClickListener({ Navigation.findNavController(binding.root).navigate(R.id.reserve)})
         return binding.root
     }
 

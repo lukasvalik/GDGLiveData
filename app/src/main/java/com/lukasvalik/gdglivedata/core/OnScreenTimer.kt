@@ -1,4 +1,4 @@
-package com.lukasvalik.gdglivedata.component
+package com.lukasvalik.gdglivedata.core
 
 import android.arch.lifecycle.*
 import android.os.Handler

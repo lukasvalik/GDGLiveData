@@ -1,4 +1,4 @@
-package com.lukasvalik.gdglivedata.model
+package com.lukasvalik.gdglivedata.db
 
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
