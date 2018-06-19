@@ -1,29 +1,53 @@
 package com.lukasvalik.gdglivedata.Repository
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MediatorLiveData
+import android.arch.lifecycle.*
 import android.support.annotation.MainThread
 import android.support.annotation.WorkerThread
 import com.lukasvalik.gdglivedata.AppExecutors
-import com.lukasvalik.gdglivedata.api.ApiEmptyResponse
-import com.lukasvalik.gdglivedata.api.ApiErrorResponse
-import com.lukasvalik.gdglivedata.api.ApiResponse
-import com.lukasvalik.gdglivedata.api.ApiSuccessResponse
+import com.lukasvalik.gdglivedata.api.*
+import com.lukasvalik.gdglivedata.Function2
 import com.lukasvalik.gdglivedata.vo.Resource
+import com.lukasvalik.gdglivedata.vo.Status
+import com.lukasvalik.gdglivedata.zipResource
 
 abstract class RoomBoundResource<ResultType, RequestType>
-@MainThread constructor(private val appExecutors: AppExecutors) {
+@MainThread constructor(private val appExecutors: AppExecutors,
+                        private val task: ApiTask<ResultType>) {
 
+    private val status = MutableLiveData<Status>()
     private val result = MediatorLiveData<Resource<ResultType>>()
 
+    // TODO store data needs to set loading to LiveData, we need to check difference of data as well to not become stuck at loading and
+    // TODo not updating data from
+
     init {
+        result.zipResource(status, loadFromDb(), object : Function2<Status, ResultType, LiveData<Resource<ResultType>>> {
+            override fun apply(t1: Status?, t2: ResultType?): LiveData<Resource<ResultType>> {
+                t1?.let {
+                    if (task.isExecuting() && result.value?.status == Status.LOADING && result.value?.data?.equals(t2) == true) {
+                        return result
+                    }
+
+                    val resource = when (status) {
+                        Status.LOADING -> Resource.loading(t2)
+                        Status.SUCCESS -> Resource.success(t2)
+                        else -> Resource.error("Error", t2) // TODO implement error message delivering
+                    }
+                    result.value = resource
+                }
+                return result
+            }
+        })
+
+        //task.execute(null)
+
         result.value = Resource.loading(null)
         @Suppress("LeakingThis")
         val dbSource = loadFromDb()
         result.addSource(dbSource) { data ->
             result.removeSource(dbSource)
             if (shouldFetch(data)) {
-                fetchFromNetwork(dbSource)
+                refreshFromNetwork()
             } else {
                 result.addSource(dbSource) { newData ->
                     setValue(Resource.success(newData))
@@ -39,45 +63,8 @@ abstract class RoomBoundResource<ResultType, RequestType>
         }
     }
 
-    private fun fetchFromNetwork(dbSource: LiveData<ResultType>) {
-        val apiResponse = createCall()
-        // we re-attach dbSource as a new source, it will dispatch its latest value quickly
-        result.addSource(dbSource) { newData ->
-            setValue(Resource.loading(newData))
-        }
-        result.addSource(apiResponse) { response ->
-            result.removeSource(apiResponse)
-            result.removeSource(dbSource)
-            when (response) {
-                is ApiSuccessResponse -> {
-                    appExecutors.diskIO().execute {
-                        saveCallResult(processResponse(response))
-                        appExecutors.mainThread().execute {
-                            // we specially request a new live data,
-                            // otherwise we will get immediately last cached value,
-                            // which may not be updated with latest results received from network.
-                            result.addSource(loadFromDb()) { newData ->
-                                setValue(Resource.success(newData))
-                            }
-                        }
-                    }
-                }
-                is ApiEmptyResponse -> {
-                    appExecutors.mainThread().execute {
-                        // reload from disk whatever we had
-                        result.addSource(loadFromDb()) { newData ->
-                            setValue(Resource.success(newData))
-                        }
-                    }
-                }
-                is ApiErrorResponse -> {
-                    onFetchFailed()
-                    result.addSource(dbSource) { newData ->
-                        setValue(Resource.error(response.errorMessage, newData))
-                    }
-                }
-            }
-        }
+    fun refreshFromNetwork() {
+        task.execute(null)
     }
 
     protected open fun onFetchFailed() {}

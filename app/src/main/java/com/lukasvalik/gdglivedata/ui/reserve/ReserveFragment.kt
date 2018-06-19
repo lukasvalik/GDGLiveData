@@ -9,7 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.lukasvalik.gdglivedata.databinding.FragmentReserveBinding
-import com.lukasvalik.gdglivedata.extensions.observeInBackground
+import com.lukasvalik.gdglivedata.observeInBackground
 
 class ReserveFragment : Fragment() {
 

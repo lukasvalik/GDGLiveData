@@ -1,7 +1,7 @@
 package com.lukasvalik.gdglivedata.api
 
 import android.arch.lifecycle.LiveData
-import com.lukasvalik.gdglivedata.model.Hotel
+import com.lukasvalik.gdglivedata.db.Hotel
 import retrofit2.http.GET
 
 interface HotelService {

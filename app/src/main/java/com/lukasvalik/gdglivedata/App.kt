@@ -4,8 +4,8 @@ import android.app.Application
 import android.arch.persistence.room.Room
 import com.lukasvalik.gdglivedata.Repository.HotelRepository
 import com.lukasvalik.gdglivedata.api.HotelService
-import com.lukasvalik.gdglivedata.model.AppDatabase
-import com.lukasvalik.gdglivedata.model.HotelDao
+import com.lukasvalik.gdglivedata.db.AppDatabase
+import com.lukasvalik.gdglivedata.db.HotelDao
 import com.lukasvalik.gdglivedata.util.LiveDataCallAdapterFactory
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -38,6 +38,6 @@ class App : Application() {
                 .addCallAdapterFactory(LiveDataCallAdapterFactory())
                 .build()
                 .create(HotelService::class.java)
-        hotelRepository = HotelRepository(hotelDao)
+        hotelRepository = HotelRepository(hotelDao, appExecutors)
     }
 }

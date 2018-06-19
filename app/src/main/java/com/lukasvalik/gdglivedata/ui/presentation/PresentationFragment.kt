@@ -10,7 +10,7 @@ import androidx.navigation.Navigation
 import com.lukasvalik.gdglivedata.App
 import com.lukasvalik.gdglivedata.R
 import com.lukasvalik.gdglivedata.databinding.FragmentPresentationBinding
-import com.lukasvalik.gdglivedata.extensions.reObserve
+import com.lukasvalik.gdglivedata.reObserve
 
 class PresentationFragment : Fragment() {
 

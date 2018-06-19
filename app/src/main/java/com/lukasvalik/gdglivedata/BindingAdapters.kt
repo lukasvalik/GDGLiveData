@@ -10,6 +10,6 @@ class BindingAdapters {
 
         @JvmStatic @BindingAdapter("url")
         fun setImageByUrl(view: ImageView, url: String?) =
-                url?.let { Glide.with(view.context).load(url).into(view) }
+                url?.let { Glide.with(view.context).load(it).into(view) }
     }
 }

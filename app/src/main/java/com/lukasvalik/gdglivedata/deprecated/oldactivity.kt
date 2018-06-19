@@ -2,12 +2,11 @@ package com.lukasvalik.gdglivedata.deprecated
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
-import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import com.lukasvalik.gdglivedata.extensions.Function2
-import com.lukasvalik.gdglivedata.extensions.zip
+import com.lukasvalik.gdglivedata.Function2
+import com.lukasvalik.gdglivedata.zip
 
 class oldactivity : AppCompatActivity() {
 
