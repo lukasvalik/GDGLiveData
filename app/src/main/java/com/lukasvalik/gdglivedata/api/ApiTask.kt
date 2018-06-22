@@ -32,7 +32,7 @@ abstract class ApiTask<T> {
     }
 
     // execute service call and return data
-    protected open fun execute(data: T?) : LiveData<Resource<T>> {
+    public open fun execute(data: T?) : LiveData<Resource<T>> {
         result.value = Resource.loading(data)
         result.addSource(service(), {
             result.removeSource(service())

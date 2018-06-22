@@ -1,37 +1,43 @@
 package com.lukasvalik.gdglivedata.Repository
 
 import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MutableLiveData
 import com.lukasvalik.gdglivedata.AppExecutors
+import com.lukasvalik.gdglivedata.api.ApiResponse
+import com.lukasvalik.gdglivedata.api.ApiTask
+import com.lukasvalik.gdglivedata.api.HotelService
 import com.lukasvalik.gdglivedata.db.Hotel
 import com.lukasvalik.gdglivedata.db.HotelDao
+import com.lukasvalik.gdglivedata.db.UserPreferences
+import com.lukasvalik.gdglivedata.vo.Resource
 
 class HotelRepository(private val hotelDao: HotelDao,
+                      private val hotelService: HotelService,
                       private val appExecutors: AppExecutors) {
 
-    private val hotels : LiveData<List<Hotel>> = hotelDao.loadHotels()
+    fun getHotels(): LiveData<Resource<List<Hotel>>> {
+        return object : NetworkBoundResource<List<Hotel>, List<Hotel>>(appExecutors) {
+            override fun saveCallResult(item: List<Hotel>) {
+                hotelDao.insertHotelList(item)
+            }
 
-    fun getHotels() : LiveData<List<Hotel>> = hotels
+            override fun shouldFetch(data: List<Hotel>?): Boolean = data == null || data.isEmpty()
 
-    fun getHotel(name: String) : LiveData<Hotel> {
-        val data = MutableLiveData<Hotel>()
-        data.value = hotels.value?.first { it.name.equals(name) }
-        return data
+            override fun loadFromDb(): LiveData<List<Hotel>> = hotelDao.loadHotels()
+
+            override fun createCall(): LiveData<ApiResponse<List<Hotel>>> = hotelService.getHotels()
+
+        }.asLiveData()
     }
 
-    fun updateHotel(hotel: Hotel) = appExecutors.diskIO().execute {hotelDao.insertHotel(hotel) }
+    fun getUserPreferences(): LiveData<Resource<UserPreferences>> {
+        return object : ApiTask<UserPreferences>() {
+
+            override fun service(): LiveData<ApiResponse<UserPreferences>> = hotelService.getUserPreferences()
+
+        }.execute(null)
+    }
+
+    fun updateHotel(hotel: Hotel) = appExecutors.diskIO().execute { hotelDao.insertHotel(hotel) }
 
     fun resetSeenHotels() = appExecutors.diskIO().execute { hotelDao.resetSeenHotels() }
-
-    fun setDefaultHotelList() = appExecutors.diskIO().execute { hotelDao.insertHotelList(DEFAULT_HOTEL_LIST) }
-
-    companion object {
-        val DEFAULT_HOTEL_LIST = arrayListOf(
-                Hotel("Hilton", "http://www3.hilton.com/resources/media/hi/WATHNHN/en_US/img/shared/full_page_image_gallery/main/HL_hotelexteriorview01_2_675x359_FitToBoxSmallDimension_Center.jpg", false),
-                Hotel("Tapolca Fogado", "https://edge.media.datahc.com/HI154550957.jpg", true),
-                Hotel("Sanja Vodice", "https://edge.media.datahc.com/HI500053572.jpg", true),
-                Hotel("Rixos Libertas", "https://edge.media.datahc.com/HI409050723.jpg", false),
-                Hotel("Lapad", "https://edge.media.datahc.com/HI401664845.jpg", false),
-                Hotel("Valamar Lacroma", "https://edge.media.datahc.com/HI380766419.jpg", false))
-    }
 }

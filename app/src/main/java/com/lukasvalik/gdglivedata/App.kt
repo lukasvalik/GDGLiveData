@@ -9,6 +9,10 @@ import com.lukasvalik.gdglivedata.db.HotelDao
 import com.lukasvalik.gdglivedata.util.LiveDataCallAdapterFactory
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+
+
 
 class App : Application() {
 
@@ -34,10 +38,17 @@ class App : Application() {
         hotelDao = database.hotelDao()
         hotelService = Retrofit.Builder()
                 .baseUrl(HotelService.BASE_URL)
+                .client(okHttpClient())
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(LiveDataCallAdapterFactory())
                 .build()
                 .create(HotelService::class.java)
-        hotelRepository = HotelRepository(hotelDao, appExecutors)
+        hotelRepository = HotelRepository(hotelDao, hotelService, appExecutors)
+    }
+
+    private fun okHttpClient() : OkHttpClient {
+        val interceptor = HttpLoggingInterceptor()
+        interceptor.level = HttpLoggingInterceptor.Level.BODY
+        return OkHttpClient.Builder().addInterceptor(interceptor).build()
     }
 }
