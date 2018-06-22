@@ -1,8 +1,6 @@
 package com.lukasvalik.gdglivedata.api
 
 import android.arch.lifecycle.LiveData
-import com.lukasvalik.gdglivedata.api.response.HotelListResponse
-import com.lukasvalik.gdglivedata.api.response.UserPreferencesResponse
 import com.lukasvalik.gdglivedata.db.Hotel
 import com.lukasvalik.gdglivedata.db.UserPreferences
 import retrofit2.http.GET
