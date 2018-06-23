@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
@@ -9,24 +10,71 @@
     </data>
 
     <android.support.constraint.ConstraintLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <!-- Hotel image, name and description -->
+        <include
+            android:id="@+id/lay_hotel"
+            layout="@layout/layout_hotel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            app:layoutVisible="@{!vm.chainRequestStatus.loading}"
+            app:descriptionVisible="@{true}"
+            app:hotel="@{vm.hotel}"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Loading with message -->
+        <include
+            android:id="@+id/lay_loading"
+            layout="@layout/layout_loading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layoutVisible="@{vm.chainRequestStatus.loading}"
+            app:message="@{String.format(@string/chain_request_status, vm.chainRequestStatus)}"
+            />
+
+        <!-- ONLY LiveData App - CheckBox label on bottom of the screen -->
         <android.support.v7.widget.AppCompatTextView
-            android:id="@+id/appCompatTextView"
+            android:id="@+id/checkbox_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:text="@string/checkbox_info"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
+        <!-- Button Reserve to start requestChain -->
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/button"
+            android:layout_width="200dp"
+            android:layout_height="@dimen/button_size"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/reserve"
+            android:visibility="@{!vm.chainRequestStatus.loading}"
+            app:layout_constraintBottom_toBottomOf="@+id/checkbox"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lay_hotel"
+            tools:text="Reserve 10" />
+
+        <!-- ONLY LiveData App - CheckBox to switch observeForever -->
         <CheckBox
+            android:id="@id/checkbox"
             android:layout_width="@dimen/checkbox_dimen"
-            android:layout_height="@dimen/checkbox_dimen"
+            android:layout_height="0dp"
+            android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
@@ -34,12 +82,11 @@
             android:layout_marginTop="8dp"
             android:checked="@={vm.checkBoxChecked}"
             android:enabled="@{!vm.chainRequestStatus.loading}"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/appCompatTextView"
-            app:layout_constraintTop_toTopOf="parent"
-            />
+            app:layout_constraintStart_toEndOf="@+id/checkbox_label"/>
 
-        <android.support.v7.widget.AppCompatTextView
+        <!--<android.support.v7.widget.AppCompatTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
@@ -51,7 +98,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="DONE" />
+            tools:text="DONE" />-->
 
     </android.support.constraint.ConstraintLayout>
 </layout>

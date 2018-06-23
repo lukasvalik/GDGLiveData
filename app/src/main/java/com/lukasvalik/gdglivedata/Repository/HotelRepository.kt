@@ -1,6 +1,7 @@
 package com.lukasvalik.gdglivedata.Repository
 
 import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.MutableLiveData
 import com.lukasvalik.gdglivedata.AppExecutors
 import com.lukasvalik.gdglivedata.api.ApiResponse
 import com.lukasvalik.gdglivedata.api.ApiTask
@@ -14,7 +15,9 @@ class HotelRepository(private val hotelDao: HotelDao,
                       private val hotelService: HotelService,
                       private val appExecutors: AppExecutors) {
 
-    fun getHotels(): LiveData<Resource<List<Hotel>>> {
+    val allHotels: LiveData<Resource<List<Hotel>>> = getHotels()
+
+    private fun getHotels(): LiveData<Resource<List<Hotel>>> {
         return object : NetworkBoundResource<List<Hotel>, List<Hotel>>(appExecutors) {
             override fun saveCallResult(item: List<Hotel>) {
                 hotelDao.insertHotelList(item)
@@ -35,6 +38,12 @@ class HotelRepository(private val hotelDao: HotelDao,
             override fun service(): LiveData<ApiResponse<UserPreferences>> = hotelService.getUserPreferences()
 
         }.execute(null)
+    }
+
+    fun getHotel(name: String): LiveData<Hotel> {
+        val data = MutableLiveData<Hotel>()
+        data.value = allHotels.value?.data?.first { it.name == name }
+        return data
     }
 
     fun updateHotel(hotel: Hotel) = appExecutors.diskIO().execute { hotelDao.insertHotel(hotel) }

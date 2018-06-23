@@ -1,8 +1,7 @@
 package com.lukasvalik.gdglivedata.ui.presentation
 
 import android.arch.lifecycle.*
-import com.lukasvalik.gdglivedata.App
-import com.lukasvalik.gdglivedata.Function2
+import com.lukasvalik.gdglivedata.*
 import com.lukasvalik.gdglivedata.R
 import com.lukasvalik.gdglivedata.Repository.HotelRepository
 import com.lukasvalik.gdglivedata.core.OnScreenTimer
@@ -10,21 +9,24 @@ import com.lukasvalik.gdglivedata.db.Hotel
 import com.lukasvalik.gdglivedata.db.UserPreferences
 import com.lukasvalik.gdglivedata.ui.common.StatusMessage
 import com.lukasvalik.gdglivedata.vo.Resource
-import com.lukasvalik.gdglivedata.zipResource
+import com.lukasvalik.gdglivedata.vo.Status
 
 class PresentationVM(private val repository: HotelRepository, app: App) : AndroidViewModel(app) {
 
     // interface from Repository
     private val userPrefs: LiveData<Resource<UserPreferences>> = repository.getUserPreferences()
-    private val allHotels: LiveData<Resource<List<Hotel>>> = repository.getHotels()
+    private val allHotels: LiveData<Resource<List<Hotel>>> = repository.allHotels
 
     //triggers
     private val hotels = MediatorLiveData<Resource<List<Hotel>>>()
     private val hotelName = MediatorLiveData<String>()
 
     // interface for UI & business logic (Data transformations)
+    val loading: LiveData<Boolean> = Transformations.switchMap(hotels) {
+        MutableLiveData<Boolean>().from(hotels.value?.status == Status.LOADING)
+    }
     val timer = OnScreenTimer(5, { markHotelAsSeen() })
-    val hotel: LiveData<Hotel> = Transformations.switchMap(hotelName, { getHotel(it) })
+    val hotel: LiveData<Hotel> = Transformations.switchMap(hotelName, { repository.getHotel(it) })
     val statusMessage: LiveData<StatusMessage?> = Transformations.map(hotels) {
         StatusMessage(it.status, it.message, userPrefs.value?.data?.costMin, userPrefs.value?.data?.costMax)
     }
@@ -39,12 +41,12 @@ class PresentationVM(private val repository: HotelRepository, app: App) : Androi
                         val result = MutableLiveData<Resource<List<Hotel>>>()
                         val value: Resource<List<Hotel>> =
                                 if (t1?.data != null && t1.data.isNotEmpty()) {
-                                    // hotels are loaded successfully
+                                    // allHotels are loaded successfully
                                     if (t2?.data != null) {
-                                        // hotels & userPreferences are loaded successfully
+                                        // allHotels & userPreferences are loaded successfully
                                         Resource.success(t1.data.filter { it.price in t2.data.costMin..t2.data.costMax })
                                     } else {
-                                        // hotels loaded successfully, but userPreferences failed
+                                        // allHotels loaded successfully, but userPreferences failed
                                         Resource.error(app.getString(R.string.message_error_no_prefs), t1.data)
                                     }
                                 } else {
@@ -65,21 +67,15 @@ class PresentationVM(private val repository: HotelRepository, app: App) : Androi
                 if (!it.isEmpty()) {
                     val nextHotel = it.firstOrNull { !it.seen }
                     if (nextHotel == null) {
-                        // all hotels have been seen -> reset the seen flag
+                        // all allHotels have been seen -> reset the seen flag
                         repository.resetSeenHotels()
                     } else {
-                        // there are unseen hotels or database has been reset and all hotels are unseen now
+                        // there are unseen allHotels or database has been reset and all allHotels are unseen now
                         hotelName.value = nextHotel.name
                     }
                 }
             }
         })
-    }
-
-    private fun getHotel(name: String): LiveData<Hotel> {
-        val data = MutableLiveData<Hotel>()
-        data.value = hotels.value?.data?.first { it.name == name }
-        return data
     }
 
     private fun markHotelAsSeen() {

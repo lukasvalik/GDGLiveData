@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.lukasvalik.gdglivedata.App
 import com.lukasvalik.gdglivedata.databinding.FragmentReserveBinding
 import com.lukasvalik.gdglivedata.observeInBackground
 
@@ -20,12 +21,14 @@ class ReserveFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentReserveBinding.inflate(inflater, container, false)
         binding.setLifecycleOwner(this)
+        binding.button.setOnClickListener({viewModel.startLoading()})
         return binding.root
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(ReserveVM::class.java)
+        val factory = ReserveVM.Factory(App.instance.hotelRepository, arguments?.getString("hotelName") ?: "")
+        viewModel = ViewModelProviders.of(this, factory).get(ReserveVM::class.java)
         binding.vm = viewModel
 
         viewModel.isSessionActive().observe(this, Observer { Log.d("SESSION", if (it == false) "closed" else "active") } )
@@ -44,6 +47,5 @@ class ReserveFragment : Fragment() {
             // we do not remove previous observer since we remove observerInBackground right after finishing task
             viewModel.getChainRequestResult().observe(this, requestObserver)
         }
-        viewModel.startLoading()
     }
 }

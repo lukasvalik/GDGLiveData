@@ -21,7 +21,11 @@ class PresentationFragment : Fragment() {
         super.onCreateView(inflater, container, savedInstanceState)
         binding = FragmentPresentationBinding.inflate(inflater, container, false)
         binding.setLifecycleOwner(this)
-        binding.button.setOnClickListener({ Navigation.findNavController(binding.root).navigate(R.id.reserve)})
+        binding.button.setOnClickListener({
+            val bundle = Bundle()
+            bundle.putString("hotelName", viewModel.hotel.value?.name)
+            Navigation.findNavController(binding.root).navigate(R.id.reserve, bundle)
+        })
         return binding.root
     }
 
