@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <import type= "com.lukasvalik.gdglivedata.vo.Status"/>
         <variable
             name="vm"
             type="com.lukasvalik.gdglivedata.ui.presentation.PresentationVM"/>
     </data>
 
-    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -45,11 +46,23 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:text="@{String.format(@string/reserve, vm.timer.seconds)}"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/error_message"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/name"
-            tools:text="Reserve 10"/>
+            tools:text="Reserve 10" />
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/error_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16dp"
+            android:padding="12dp"
+            app:statusVisibility="@{vm.statusMessage}"
+            app:statusText="@{vm.statusMessage}"
+            app:statusColor="@{vm.statusMessage}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:text="Set Your Preferences"/>
 
     </android.support.constraint.ConstraintLayout>
 </layout>

@@ -27,7 +27,7 @@ class PresentationFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        val factory = PresentationVM.Factory(App.instance.hotelRepository)
+        val factory = PresentationVM.Factory(App.instance)
         viewModel = ViewModelProviders.of(this, factory).get(PresentationVM::class.java)
         binding.vm = viewModel
 

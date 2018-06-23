@@ -24,9 +24,8 @@ class App : Application() {
     private lateinit var database: AppDatabase
     private lateinit var hotelDao: HotelDao
     private lateinit var hotelService: HotelService
+    private lateinit var appExecutors: AppExecutors
 
-    lateinit var appExecutors: AppExecutors
-        private set
     lateinit var hotelRepository: HotelRepository
         private set
 

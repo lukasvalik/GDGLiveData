@@ -4,4 +4,7 @@
     <string name="chain_request_status">Request Chain status: %s</string>
     <string name="session_status">Session status: %s</string>
     <string name="checkbox_info">Loading in background (ObserveForever)</string>
+    <string name="message_success">Hotels within price range from %1$d to %2$d</string>
+    <string name="message_error_no_prefs">Set your preferences</string>
+    <string name="message_error_no_hotels">Hotels fetch error</string>
 </resources>

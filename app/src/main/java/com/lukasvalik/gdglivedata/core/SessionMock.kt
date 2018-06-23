@@ -1,5 +1,6 @@
 package com.lukasvalik.gdglivedata.core
 
+import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
 import android.os.Handler
@@ -16,7 +17,7 @@ class SessionMock {
     private var timestamp = System.currentTimeMillis()
 
     private var sessionRefreshed = MutableLiveData<Boolean>()
-    val active = Transformations.switchMap(sessionRefreshed, {
+    val active: LiveData<Boolean> = Transformations.switchMap(sessionRefreshed, {
         val active = MutableLiveData<Boolean>()
         val now = System.currentTimeMillis()
         active.value = timestamp + SESSION_TIMEOUT >= now
