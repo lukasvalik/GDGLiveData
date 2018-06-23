@@ -24,7 +24,7 @@ class ReserveVM(repository: HotelRepository,
 
     fun startLoading() {
         session.reset()
-        chainRequest.scheduleLoading()
+        chainRequest.startLoading()
     }
 
     fun isSessionActive() : LiveData<Boolean> = session.active
@@ -32,6 +32,10 @@ class ReserveVM(repository: HotelRepository,
     fun getChainRequestResult() : LiveData<Boolean> = chainRequest.getResult()
 
     fun getChainRequestStatus() : LiveData<ChainRequestMock.ChainRequestStatus> = chainRequest.chainRequestStatus
+
+    fun resetChainRequestStatus() {
+        chainRequest.resetStatus()
+    }
 
     class Factory constructor(private val hotelRepository: HotelRepository,
                               private val hotelName: String) : ViewModelProvider.NewInstanceFactory() {

@@ -47,5 +47,6 @@ class ReserveFragment : Fragment() {
             // we do not remove previous observer since we remove observerInBackground right after finishing task
             viewModel.getChainRequestResult().observe(this, requestObserver)
         }
+        viewModel.resetChainRequestStatus()
     }
 }

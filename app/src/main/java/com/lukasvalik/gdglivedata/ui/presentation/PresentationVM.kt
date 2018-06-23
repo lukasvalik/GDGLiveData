@@ -34,7 +34,7 @@ class PresentationVM(private val repository: HotelRepository, app: App) : Androi
     init {
 
         // Define additional business logic
-        hotels.zipResource(allHotels, userPrefs,
+        hotels.zip(allHotels, userPrefs,
                 object : Function2<Resource<List<Hotel>>, Resource<UserPreferences>, LiveData<Resource<List<Hotel>>>> {
 
                     override fun apply(t1: Resource<List<Hotel>>?, t2: Resource<UserPreferences>?): LiveData<Resource<List<Hotel>>> {
@@ -42,12 +42,12 @@ class PresentationVM(private val repository: HotelRepository, app: App) : Androi
                         val value: Resource<List<Hotel>> =
                                 if (t1?.data != null && t1.data.isNotEmpty()) {
                                     // allHotels are loaded successfully
-                                    if (t2?.data != null) {
-                                        // allHotels & userPreferences are loaded successfully
-                                        Resource.success(t1.data.filter { it.price in t2.data.costMin..t2.data.costMax })
-                                    } else {
-                                        // allHotels loaded successfully, but userPreferences failed
-                                        Resource.error(app.getString(R.string.message_error_no_prefs), t1.data)
+                                    when {
+                                        t2?.status == Status.LOADING -> Resource.loading(null) // wait for prefs
+                                        t2?.data != null -> // allHotels & userPreferences are loaded successfully
+                                            Resource.success(t1.data.filter { it.price in t2.data.costMin..t2.data.costMax })
+                                        else -> // allHotels loaded successfully, but userPreferences failed
+                                            Resource.error(app.getString(R.string.message_error_no_prefs), t1.data)
                                     }
                                 } else {
                                     // Hotels failed or are empty

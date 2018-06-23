@@ -13,22 +13,18 @@ class ChainRequestMock(private val session: SessionMock) {
 
     // provides info about state of chained requests
     enum class ChainRequestStatus(val loading: Boolean) {
-        BEFORE_LOADING(true),
-        LOADING_REQUEST_1(true),
-        ERROR_1(false),
-        LOADING_REQUEST_2(true),
-        ERROR_2(false),
-        DONE(false)
+        BEFORE_LOADING(false),
+        CALL_VERIFYING_SMT(true),
+        ERROR_VERIFICATION(false),
+        CALL_RESERVATION(true),
+        ERROR_RESERVATION(false),
+        RESERVED_SUCCESSFULLY(false)
     }
-
-    // status of request chain showed in fragment
-    val chainRequestStatus = MutableLiveData<ChainRequestStatus>()
 
     private val requestHandler = Handler()
 
-    /**
-     * Request chain mock
-     */
+    // status of request chain showed in fragment
+    val chainRequestStatus = MutableLiveData<ChainRequestStatus>()
 
     private val request1 = MutableLiveData<Boolean>()
     private val request2 = Transformations.switchMap(request1, {
@@ -36,24 +32,31 @@ class ChainRequestMock(private val session: SessionMock) {
         it?.let {
             if (it) {
                 // request1 was successful - update view & schedule next request in chain
-                chainRequestStatus.value = ChainRequestStatus.LOADING_REQUEST_2
+                chainRequestStatus.value = ChainRequestStatus.CALL_RESERVATION
                 scheduleResponse2(req)
             } else {
                 // request1 was unsuccessful - show error
-                chainRequestStatus.value = ChainRequestStatus.ERROR_1
+                chainRequestStatus.value = ChainRequestStatus.ERROR_VERIFICATION
             }
         }
         req
     })
 
+    init {
+        chainRequestStatus.value = ChainRequestStatus.BEFORE_LOADING
+    }
+
     fun getResult() : LiveData<Boolean> = request2
 
-    fun scheduleLoading() {
-        chainRequestStatus.value = ChainRequestStatus.BEFORE_LOADING
-        requestHandler.postDelayed({
-            chainRequestStatus.value = ChainRequestStatus.LOADING_REQUEST_1
+    fun startLoading() {
+        requestHandler.post({
+            chainRequestStatus.value = ChainRequestStatus.CALL_VERIFYING_SMT
             scheduleFinishLoadingRequest1()
-        }, DELAY)
+        })
+    }
+
+    fun resetStatus() {
+        chainRequestStatus.value = ChainRequestStatus.BEFORE_LOADING
     }
 
     private fun scheduleFinishLoadingRequest1() {
@@ -64,7 +67,7 @@ class ChainRequestMock(private val session: SessionMock) {
     private fun scheduleResponse2(req: MutableLiveData<Boolean>) {
         requestHandler.postDelayed({
             session.active.value?.let {
-                chainRequestStatus.value = if (it) ChainRequestStatus.DONE else ChainRequestStatus.ERROR_2
+                chainRequestStatus.value = if (it) ChainRequestStatus.RESERVED_SUCCESSFULLY else ChainRequestStatus.ERROR_RESERVATION
                 req.value = it
             }
         }, DELAY)

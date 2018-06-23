@@ -36,7 +36,7 @@ class UnRegisterObserver<T>(private val liveData: LiveData<T>,
 }
 
 // Zip 2 sources - Based on Transformations.SwitchMap
-fun <T1, T2, R> MediatorLiveData<Resource<R>>.zipResource(t1Data: LiveData<T1>, t2Data: LiveData<T2>,
+fun <T1, T2, R> MediatorLiveData<Resource<R>>.zip(t1Data: LiveData<T1>, t2Data: LiveData<T2>,
                                                   func: Function2<T1, T2, LiveData<Resource<R>>>) : MediatorLiveData<Resource<R>> {
 
     addSource<T1>(t1Data, object : Observer<T1> {

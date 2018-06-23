@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <import type="com.lukasvalik.gdglivedata.core.ChainRequestMock.ChainRequestStatus"/>
         <variable
             name="vm"
             type="com.lukasvalik.gdglivedata.ui.reserve.ReserveVM"/>
@@ -42,10 +43,7 @@
             android:id="@+id/checkbox_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_margin="8dp"
             android:text="@string/checkbox_info"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
@@ -55,15 +53,10 @@
             android:id="@+id/button"
             android:layout_width="200dp"
             android:layout_height="@dimen/button_size"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_margin="8dp"
             android:text="@string/reserve"
             android:visibility="@{!vm.chainRequestStatus.loading}"
-            app:layout_constraintBottom_toBottomOf="@+id/checkbox"
+            app:layout_constraintBottom_toTopOf="@+id/checkbox"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/lay_hotel"
@@ -74,31 +67,27 @@
             android:id="@id/checkbox"
             android:layout_width="@dimen/checkbox_dimen"
             android:layout_height="0dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_margin="8dp"
             android:checked="@={vm.checkBoxChecked}"
             android:enabled="@{!vm.chainRequestStatus.loading}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/checkbox_label"/>
 
-        <!--<android.support.v7.widget.AppCompatTextView
+        <!-- Display status of call -->
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/status"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_margin="8dp"
+            android:gravity="center"
+            android:visibility="@{!vm.chainRequestStatus.loading}"
             android:text="@{String.format(@string/chain_request_status, vm.chainRequestStatus)}"
-            android:textSize="22dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:textSize="16dp"
+            app:layout_constraintBottom_toTopOf="@id/checkbox"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="DONE" />-->
+            app:layout_constraintTop_toBottomOf="@id/button"
+            tools:text="DONE" />
 
     </android.support.constraint.ConstraintLayout>
 </layout>
