@@ -1,6 +1,16 @@
 package com.miroslavkacera.rxapp.repository
 
-class HotelRepository {
+import com.miroslavkacera.rxapp.model.Hotel
+import com.miroslavkacera.rxapp.model.UserPreferences
+import io.reactivex.Completable
+import io.reactivex.Flowable
+import io.reactivex.Single
+
+interface HotelRepository {
+
+    fun refreshData(): Completable
+    fun getHotels(): Flowable<List<Hotel>>
+    fun getUserPreferences(): Single<UserPreferences>
 
     //TODO fetch hotels and store them to db
     //TODO fetch userPreferencies - I do not store them in db currently (do not know why)

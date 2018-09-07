@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.miroslavkacera.rxapp.ui.presentation.HotelsFragmentViewModel"/>
+    </data>
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:refreshing="@={viewModel.refreshing}">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <include
+                android:id="@+id/include"
+                layout="@layout/layout_hotel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:hotelViewModel="@{viewModel}"/>
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/button"
+                android:layout_width="200dp"
+                android:layout_height="@dimen/button_size"
+                android:layout_margin="8dp"
+                android:visibility="@{!viewModel.loading}"
+                app:layout_constraintBottom_toBottomOf="@+id/error_message"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/include"
+                tools:text="More 10"/>
+            <!--
+            android:text="@{String.format(@string/more, viewModel.timer.seconds)}"-->
+
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/error_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="12dp"
+                android:text="@{viewModel.statusMessage}"
+                android:textSize="16sp"
+                android:visibility="@{!viewModel.loading}"
+                app:backgroundColorResource="@{viewModel.statusColor}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                tools:text="Set Your Preferences"/>
+
+        </android.support.constraint.ConstraintLayout>
+    </android.support.v4.widget.SwipeRefreshLayout>
+</layout>

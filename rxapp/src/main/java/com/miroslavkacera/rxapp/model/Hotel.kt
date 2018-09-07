@@ -1,6 +1,10 @@
 package com.miroslavkacera.rxapp.model
 
-data class Hotel(val name: String,
+import android.arch.persistence.room.Entity
+import android.arch.persistence.room.PrimaryKey
+
+@Entity
+data class Hotel(@PrimaryKey val name: String,
                  val description: String,
                  val url: String,
                  val price: Int,
