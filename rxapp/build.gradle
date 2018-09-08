@@ -46,6 +46,7 @@ dependencies {
     //architecture components
     implementation "android.arch.lifecycle:runtime:$arch_components_version"
     implementation "android.arch.lifecycle:extensions:$arch_components_version"
+    implementation "android.arch.lifecycle:common-java8:$arch_components_version"
     kapt "android.arch.lifecycle:compiler:$arch_components_version"
     implementation "android.arch.persistence.room:runtime:$arch_persistance_version"
     kapt "android.arch.persistence.room:compiler:$arch_persistance_version"

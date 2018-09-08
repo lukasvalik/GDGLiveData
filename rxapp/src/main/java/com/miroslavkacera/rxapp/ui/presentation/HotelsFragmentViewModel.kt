@@ -1,5 +1,7 @@
 package com.miroslavkacera.rxapp.ui.presentation
 
+import android.arch.lifecycle.DefaultLifecycleObserver
+import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import android.databinding.Bindable
@@ -11,11 +13,15 @@ import com.miroslavkacera.rxapp.model.Hotel
 import com.miroslavkacera.rxapp.model.UserPreferences
 import com.miroslavkacera.rxapp.repository.HotelRepository
 import com.miroslavkacera.rxapp.utils.FormattedString
+import com.miroslavkacera.rxapp.utils.Timer
+import com.miroslavkacera.rxapp.utils.plusAssign
 import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
+import io.reactivex.subjects.BehaviorSubject
 
-class HotelsFragmentViewModel(private val hotelRepository: HotelRepository) : BindableViewModel(), HotelViewModel {
+class HotelsFragmentViewModel(private val hotelRepository: HotelRepository) : BindableViewModel(), DefaultLifecycleObserver, HotelViewModel {
 
     @get:Bindable
     var statusMessage: FormattedString? = null
@@ -32,11 +38,19 @@ class HotelsFragmentViewModel(private val hotelRepository: HotelRepository) : Bi
             notifyPropertyChanged(BR.statusColor)
         }
 
+    private val loadingSubject = BehaviorSubject.createDefault(true)
+    var loading: Boolean
+        @Bindable get() = loadingSubject.value!!
+        private set(value) {
+            loadingSubject.onNext(value)
+            notifyPropertyChanged(BR.loading)
+        }
+
     @get:Bindable
-    var loading: Boolean = true
+    var timerValue: Int = 5
         private set(value) {
             field = value
-            notifyPropertyChanged(BR.loading)
+            notifyPropertyChanged(BR.timerValue)
         }
 
     private var hotels: List<Hotel>? = null
@@ -46,13 +60,30 @@ class HotelsFragmentViewModel(private val hotelRepository: HotelRepository) : Bi
         }
 
     private val disposables = CompositeDisposable()
+    private var timerDisposable: Disposable? = null
+    private val timer = Timer(timerValue)
 
     init {
         fetchHotelsFromRemote()
     }
 
+    override fun onResume(owner: LifecycleOwner) {
+        disposables += loadingSubject.subscribe { loading ->
+            if (loading) {
+                timer.reset()
+                timerDisposable?.dispose()
+            } else {
+                timerDisposable = timer.countDown().subscribe({ tick -> timerValue = tick }, { error -> error.printStackTrace() })
+            }
+        }
+    }
+
+    override fun onPause(owner: LifecycleOwner) {
+        timerDisposable?.dispose()
+    }
+
     private fun fetchHotelsFromRemote() {
-        disposables.add(Flowable.combineLatest(hotelRepository.getHotels(), hotelRepository.getUserPreferences().doOnSuccess { preference ->
+        disposables += Flowable.combineLatest(hotelRepository.getHotels(), hotelRepository.getUserPreferences().doOnSuccess { preference ->
             statusMessage = FormattedString.from(R.string.message_success, preference.costMin, preference.costMax)
             statusColor = R.color.success
         }.toFlowable(),
@@ -66,8 +97,7 @@ class HotelsFragmentViewModel(private val hotelRepository: HotelRepository) : Bi
                 }, { error ->
                     statusMessage = FormattedString.from(error.localizedMessage)
                     statusColor = R.color.error
-                }))
-
+                })
     }
 
     @Bindable
@@ -76,10 +106,10 @@ class HotelsFragmentViewModel(private val hotelRepository: HotelRepository) : Bi
     fun setRefreshing(refreshing: Boolean) {
         loading = refreshing
         if (refreshing) {
-            disposables.add(hotelRepository.refreshData().subscribe({}, { error ->
+            disposables += hotelRepository.refreshData().subscribe({}, { error ->
                 statusMessage = FormattedString.from(error.localizedMessage)
                 statusColor = R.color.error
-            }))
+            })
         }
     }
 

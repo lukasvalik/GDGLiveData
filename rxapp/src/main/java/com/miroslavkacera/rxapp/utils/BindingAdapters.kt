@@ -22,6 +22,11 @@ class BindingAdapters {
                 url?.let { Glide.with(view.context).load(it).into(view) }
 
         @JvmStatic
+        @BindingAdapter("backgroundColorResource")
+        fun setText(view: View, @ColorRes color: Int) =
+                view.setBackgroundColor(ContextCompat.getColor(view.context, color))
+
+        @JvmStatic
         @BindingAdapter("android:visibility")
         fun setViewVisibility(view: View, visible: Boolean) {
             view.visibility = if (visible) View.VISIBLE else View.GONE
@@ -29,17 +34,15 @@ class BindingAdapters {
 
         @InverseBindingAdapter(attribute = "refreshing", event = "refreshingAttrChanged")
         @JvmStatic
-        fun isRefreshing(view: SwipeRefreshLayout): Boolean {
-            return view.isRefreshing
-        }
+        fun isRefreshing(view: SwipeRefreshLayout) = view.isRefreshing
 
         @BindingAdapter("refreshingAttrChanged")
         @JvmStatic
-        fun setListener(view: SwipeRefreshLayout, attrChange: InverseBindingListener) {
-            view.setOnRefreshListener { attrChange.onChange() }
-        }
+        fun setListener(view: SwipeRefreshLayout, attrChange: InverseBindingListener) =
+                view.setOnRefreshListener { attrChange.onChange() }
 
-        @JvmStatic @BindingAdapter("refreshSensitivity")
+        @JvmStatic
+        @BindingAdapter("refreshSensitivity")
         fun setSwipeRefreshSensibility(view: SwipeRefreshLayout, sensitivityLevel: Float) {
             val viewTreeObserver = view.viewTreeObserver
             viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
@@ -57,12 +60,6 @@ class BindingAdapters {
         @BindingAdapter("android:text")
         fun setText(view: TextView, string: FormattedString?) {
             view.text = string?.getFormattedString(view.context) ?: ""
-        }
-
-        @JvmStatic
-        @BindingAdapter("backgroundColorResource")
-        fun setText(view: View, @ColorRes color: Int) {
-            view.setBackgroundColor(ContextCompat.getColor(view.context, color))
         }
     }
 }

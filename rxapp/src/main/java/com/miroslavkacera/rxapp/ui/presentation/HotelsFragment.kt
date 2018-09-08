@@ -1,7 +1,5 @@
 package com.miroslavkacera.rxapp.ui.presentation
 
-import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -19,9 +17,11 @@ class HotelsFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentPresentationBinding.inflate(inflater, container, false)
-        binding.viewModel = ViewModelProviders.of(this,
+        val fragmentViewModel = ViewModelProviders.of(this,
                 HotelsFragmentViewModel.Factory(HotelRepositoryImpl(HotelsDatabase.getInstance(context!!).hotelDao(), HotelService.API)))
                 .get(HotelsFragmentViewModel::class.java)
+        lifecycle.addObserver(fragmentViewModel)
+        binding.viewModel = fragmentViewModel
         return binding.root
     }
 
