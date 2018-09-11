@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Rx App</string>
+    <string name="app_name">Rx-App</string>
     <string name="more">more %d</string>
     <string name="reserve">reserve</string>
     <string name="chain_request_status">Request Chain status: %s</string>

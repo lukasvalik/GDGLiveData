@@ -6,16 +6,15 @@
     <fragment
         android:id="@+id/presentationFragment"
         android:name="com.miroslavkacera.rxapp.ui.presentation.HotelsFragment"
-        android:label="Hotels" >
+        android:label="Rx-App Hotels" >
         <action
             android:id="@+id/reserve"
-            destination="@+id/reserveFragment"
             app:destination="@id/reserveFragment" />
     </fragment>
     <fragment
         android:id="@+id/reserveFragment"
         android:name="com.miroslavkacera.rxapp.ui.reserve.ReserveFragment"
-        android:label="Reserve Hotel" >
+        android:label="Rx-App Reserve Hotel" >
         <argument
             android:name="hotelName"
             app:type="string"
