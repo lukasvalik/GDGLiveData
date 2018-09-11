@@ -4,7 +4,7 @@ import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 
-class Timer(private val targetTime: Int = 5) {
+class Timer(private val targetTime: Int = 5, private val onCountDown:() -> Unit) {
 
     private var currentTime = targetTime
 
@@ -25,6 +25,7 @@ class Timer(private val targetTime: Int = 5) {
     private fun getTime(): Int {
         if (--currentTime <= 0) {
             currentTime = targetTime
+            onCountDown()
         }
 
         return currentTime

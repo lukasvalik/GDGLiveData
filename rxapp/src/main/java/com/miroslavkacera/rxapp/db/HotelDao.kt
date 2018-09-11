@@ -25,6 +25,6 @@ interface HotelDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertHotelList(hotels: List<Hotel>)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertHotel(hotel: Hotel)
+    @Query("UPDATE Hotel SET seen = 1 WHERE name = :name")
+    fun markHotelSeen(name: String)
 }

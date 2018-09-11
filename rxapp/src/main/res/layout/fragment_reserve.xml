@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <!-- <import type="com.miroslavkacera.rxapp.utils.mock.ChainRequestMock.ChainRequestStatus"/>-->
+        <import type="android.view.View"/>
+
+        <variable
+            name="viewModel"
+            type="com.miroslavkacera.rxapp.ui.reserve.ReserveFragmentViewModel"/>
+    </data>
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Hotel image, name and description -->
+        <include
+            android:id="@+id/lay_hotel"
+            layout="@layout/layout_hotel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            app:hotelViewModel="@{viewModel}"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <!-- Loading with message -->
+        <include
+            android:id="@+id/lay_loading"
+            layout="@layout/layout_loading"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="@{viewModel.loading ? View.VISIBLE : View.GONE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:message="@{viewModel.status}"
+            tools:visibility="gone"/>
+
+        <!-- Button Reserve to start requestChain -->
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/button"
+            android:layout_width="200dp"
+            android:layout_height="@dimen/button_size"
+            android:layout_marginBottom="32dp"
+            android:onClick="@{viewModel::onButtonClicked}"
+            android:text="@string/reserve"
+            android:visibility="@{!viewModel.loading}"
+            app:layout_constraintBottom_toTopOf="@+id/status"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <!-- Display status of call -->
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:gravity="center"
+            android:text="@{String.format(@string/chain_request_status, viewModel.status)}"
+            android:textSize="16sp"
+            android:visibility="@{!viewModel.loading}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/lay_hotel"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:text="DONE"/>
+
+    </android.support.constraint.ConstraintLayout>
+</layout>

@@ -16,8 +16,9 @@
         android:id="@+id/reserveFragment"
         android:name="com.miroslavkacera.rxapp.ui.reserve.ReserveFragment"
         android:label="Reserve Hotel" >
-        <!--<argument
-            android:name="name"
-            app:type="string" />-->
+        <argument
+            android:name="hotelName"
+            app:type="string"
+            android:defaultValue=""/>
     </fragment>
 </navigation>

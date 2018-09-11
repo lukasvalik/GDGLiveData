@@ -1,11 +1,14 @@
 package com.miroslavkacera.rxapp.ui.presentation
 
+import android.annotation.SuppressLint
 import android.arch.lifecycle.DefaultLifecycleObserver
 import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import android.databinding.Bindable
+import android.os.Bundle
 import android.support.annotation.ColorRes
+import android.view.View
 import com.kacera.utils.bindableviewmodel.BR
 import com.kacera.utils.bindableviewmodel.BindableViewModel
 import com.miroslavkacera.rxapp.R
@@ -13,6 +16,7 @@ import com.miroslavkacera.rxapp.model.Hotel
 import com.miroslavkacera.rxapp.model.UserPreferences
 import com.miroslavkacera.rxapp.repository.HotelRepository
 import com.miroslavkacera.rxapp.utils.FormattedString
+import com.miroslavkacera.rxapp.utils.SignalingObservable
 import com.miroslavkacera.rxapp.utils.Timer
 import com.miroslavkacera.rxapp.utils.plusAssign
 import io.reactivex.Flowable
@@ -61,14 +65,17 @@ class HotelsFragmentViewModel(private val hotelRepository: HotelRepository) : Bi
 
     private val disposables = CompositeDisposable()
     private var timerDisposable: Disposable? = null
-    private val timer = Timer(timerValue)
+    private val timer = Timer(timerValue, ::markHotelAsSeen)
+
+    val buttonSignal: SignalingObservable<Bundle> = SignalingObservable()
 
     init {
         fetchHotelsFromRemote()
     }
 
+    @SuppressLint("RxSubscribeOnError")
     override fun onResume(owner: LifecycleOwner) {
-        disposables += loadingSubject.subscribe { loading ->
+        disposables += loadingSubject.distinctUntilChanged().subscribe { loading ->
             if (loading) {
                 timer.reset()
                 timerDisposable?.dispose()
@@ -89,15 +96,26 @@ class HotelsFragmentViewModel(private val hotelRepository: HotelRepository) : Bi
         }.toFlowable(),
                 BiFunction<List<Hotel>, UserPreferences, Pair<List<Hotel>, UserPreferences>> { hotels, preference -> hotels to preference })
                 .map { pair ->
-                    pair.first.filter { it.price in pair.second.costMin..pair.second.costMax }
+                    pair.first.filter { it.price in pair.second.costMin..pair.second.costMax && !it.seen }
                 }
                 .subscribe({ hotels ->
-                    this.hotels = hotels
-                    loading = false
+                    if (hotels.isEmpty()) {
+                        hotelRepository.resetHotels()
+                    } else {
+                        this.hotels = hotels
+                        loading = false
+                    }
                 }, { error ->
                     statusMessage = FormattedString.from(error.localizedMessage)
                     statusColor = R.color.error
                 })
+    }
+
+    private fun markHotelAsSeen() {
+        hotels?.get(0)?.let {
+            it.seen = true
+            hotelRepository.markHotelSeen(it)
+        }
     }
 
     @Bindable
@@ -128,6 +146,12 @@ class HotelsFragmentViewModel(private val hotelRepository: HotelRepository) : Bi
         return hotels?.get(0)?.description
     }
 
+    fun onButtonClicked(view: View) {
+        val bundle = Bundle()
+        bundle.putString("hotelName", getName())
+        buttonSignal.onNext(bundle)
+    }
+
     override fun onCleared() {
         super.onCleared()
 
@@ -138,20 +162,4 @@ class HotelsFragmentViewModel(private val hotelRepository: HotelRepository) : Bi
         override fun <T : ViewModel?> create(modelClass: Class<T>): T =
                 HotelsFragmentViewModel(repository) as T
     }
-
-//TODO getHotels from api
-    //TODO getUserPreferences from api
-    //TODO zip hotels and prefs to filter hotels with price in range from prefs.costMin to prefs.costMax && show hotel wo description
-    // if prefs are not loaded, show all
-    //TODO take first unseen hotel (All hotels are unseen at first) and show it in fragment
-    //TODO show button more with seconds counting down to 0 then mark hotel as seen and take another hotel
-    //TODO after all hotels are seen, reset whole list to unseen
-
-    //TODO pass clicked hotel to ReserveFragment
-
-    //Optional
-    //TODO shows status message
-    // success - Hotels within price range from %1$d to %2$d
-    // getHotels success && getUserPreferences failed - Set your preferences
-    // both error - Hotels fetch error
 }

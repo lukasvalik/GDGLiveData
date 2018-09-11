@@ -35,7 +35,7 @@ class SessionMock {
                 sessionHandler.postDelayed(sessionRefreshRunnable, REFRESH_SESSION)
             }
         }
-        sessionHandler.post(sessionRefreshRunnable)
+        //sessionHandler.post(sessionRefreshRunnable)
     }
 
     fun reset() {

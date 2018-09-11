@@ -6,4 +6,6 @@
 
     <color name="success">#00d800</color>
     <color name="error">#fc0000</color>
+
+    <color name="white">@android:color/white</color>
 </resources>
